@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SERVICE_FILENAME='slave_takeover_bot.service'
-SERVICE_NAME='Slave & takeover Shokh's bot'
+SERVICE_NAME='Slave & takeover Shokhs bot'
 
 SCRIPT_PATH=$(dirname "$(dirname "$(readlink -f "$0")")")
 
@@ -28,6 +28,3 @@ echo "${YELLOW}Enable ${SERVICE_FILENAME}${NC}"
 sudo systemctl daemon-reload
 sudo systemctl enable ${SERVICE_FILENAME}
 echo
-
-
-
