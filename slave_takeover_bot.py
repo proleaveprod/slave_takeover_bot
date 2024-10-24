@@ -1,17 +1,15 @@
-import sys,os
-sys.path.append(f"{os.path.abspath("")}\\.venv\\Lib\\site-packages")
+import os, threading, json
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
-import threading, time, json, bot
+from bot import bot_start
 from google_sheets import carTable
 
-
-
 bot_configs = dict()
-with open('settings\\settings.json', 'r', encoding='utf-8') as file:
+with open('settings/settings.json', 'r', encoding='utf-8') as file:
     bot_configs = json.load(file)
 
 def telebot_handle():
-    bot.bot_start()
+    bot_start()
 
 if __name__ == '__main__':
 

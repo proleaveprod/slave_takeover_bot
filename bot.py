@@ -3,13 +3,13 @@ from google_sheets import carTable
 from telebot import types
 
 bot_configs = dict()
-with open('settings\\settings.json', 'r', encoding='utf-8') as file:
+with open('settings/settings.json', 'r', encoding='utf-8') as file:
     bot_configs = json.load(file)
 
 
 
 # Путь к файлу для сохранения данных пользователей
-USER_DATA_FILE = 'settings\\user_data.json'
+USER_DATA_FILE = 'settings/user_data.json'
 
 # Загрузка данных о пользователях из файла
 def load_user_data():
@@ -113,9 +113,9 @@ def handle_message(message):
 def bot_start():
 
     while True:
-        # try:
+        try:
             print("Bot polling is started")
             bot.polling(non_stop=True,interval=1,timeout=50)
-        # except Exception as err:
-        #     print(f"bot.polling() ERROR:\n{err}\n\n Restart in 5 sec")
-        #     time.sleep(5)
+        except Exception as err:
+            print(f"bot.polling() ERROR:\n{err}\n\n Restart in 5 sec")
+            time.sleep(5)

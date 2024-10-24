@@ -63,6 +63,6 @@ class GoogleSheets:
 
 # -------------------------------------------------------
 carTable = None
-with open('settings\\settings.json', 'r', encoding='utf-8') as file:
+with open('settings/settings.json', 'r', encoding='utf-8') as file:
     bot_configs = json.load(file)
     carTable = GoogleSheets(bot_configs)
