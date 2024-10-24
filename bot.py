@@ -1,15 +1,16 @@
 import telebot, time, os, json
 from google_sheets import carTable
 from telebot import types
+from file_logger import logger
 
 bot_configs = dict()
-with open('settings\\settings.json', 'r', encoding='utf-8') as file:
+with open('settings/settings.json', 'r', encoding='utf-8') as file:
     bot_configs = json.load(file)
 
 
 
 # Путь к файлу для сохранения данных пользователей
-USER_DATA_FILE = 'settings\\user_data.json'
+USER_DATA_FILE = 'settings/user_data.json'
 
 # Загрузка данных о пользователях из файла
 def load_user_data():
@@ -35,11 +36,13 @@ def start(message):
     
     for region in carTable.brands.keys():
         markup.add(types.KeyboardButton(region))
-    
-    
+
     admin_list = bot_configs.get('admin_list')
     if message.from_user.id in admin_list:
         markup.add(types.KeyboardButton("🛠 Обновить базу"))
+
+    if message.from_user.id not in user_data.keys():
+        logger.debug(f"Bot: New user {message.from_user.id}")
 
     bot.send_message(message.chat.id, "Выберите регион производителя", reply_markup=markup)
 
@@ -49,6 +52,8 @@ def handle_message(message):
     user_id = str(message.from_user.id)
     text = message.text
 
+    logger.debug(f"Bot: {message.from_user.id} request: {text}")
+    
     if text in carTable.brands.keys():
         # Пользователь выбрал регион
         region = text
@@ -72,7 +77,6 @@ def handle_message(message):
         user_data[user_id]["brand"] = chosen_brand
         save_user_data(user_data)
 
-        print(f"Request from user({user_id}):{user_data[user_id]}")        
         car_n = 1
         for i in range(len(carTable.cars)):
             car = carTable.cars[i]
@@ -86,7 +90,7 @@ def handle_message(message):
                 
                 msg_body = list()
                 for idx in range(5,len(carTable.columns)):
-                    msg_body.append(f"<i>{carTable.columns[idx]}</i>: <b>{car.data[idx]}</b>")
+                    msg_body.append(f"<code>{carTable.columns[idx]}</code>: <b>{car.data[idx]}</b>")
                 msg_body = "\n".join(msg_body)
 
 
@@ -104,18 +108,18 @@ def handle_message(message):
             try:
                 carTable.update()
                 bot.send_message(message.chat.id, f"База успешно обновлена")
-                print(f"Base updated by user({message.from_user.id}): {len(carTable.cars)} cars")
             except Exception as err:
                 bot.send_message(message.chat.id, f"Ошибка обновления базы:\n{err}")
-                print(f"Error base update by user({message.from_user.id}):\n{err}")
         else:
             bot.send_message(message.chat.id, f"Доступ запрещен")
+            logger.debug("Bot: Access denied")
 def bot_start():
 
     while True:
-        # try:
-            print("Bot polling is started")
+        try:
+            logger.info("Bot: Starting of the polling")
             bot.polling(non_stop=True,interval=1,timeout=50)
-        # except Exception as err:
-        #     print(f"bot.polling() ERROR:\n{err}\n\n Restart in 5 sec")
-        #     time.sleep(5)
+        except Exception as err:
+            logger.error(f"Bot: Polling ERROR:\n{err}")
+            logger.info(f"Bot: Restart in 5 second")
+            time.sleep(5)

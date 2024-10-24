@@ -1,0 +1,1 @@
+LANG=ru_RU.UTF-8 systemctl status slave_takeover_bot.service

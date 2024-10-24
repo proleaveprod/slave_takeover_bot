@@ -1,0 +1,1 @@
+LANG=ru_RU.UTF-8 journalctl -u slave_takeover_bot.service --since="2 days ago"

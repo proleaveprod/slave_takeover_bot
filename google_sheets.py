@@ -1,7 +1,7 @@
 import gspread, json
 from oauth2client.service_account import ServiceAccountCredentials
 
-
+from file_logger import logger
 
 
 class GoogleSheets:
@@ -25,17 +25,18 @@ class GoogleSheets:
         self.cars     = list()
 
         try:
-            print("Google API auth...")
+            logger.info("Google API: Auth...")
             scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
             creds = ServiceAccountCredentials.from_json_keyfile_name(filename=self.configs['api-key-filename'],
                                                                      scopes=scope)
             self.client = gspread.authorize(creds)
-            print("Authorized")
+            logger.info("Google API: Auth is OK")
         except Exception as err:
-            print("Google API auth ERROR:")
-            print(err, '\n\n')
+            logger.error(f"Google API: Auth ERROR:\n{err}")
 
-    def update(self):  # Обновить локальные данные в ./data
+    def update(self):  # Обновить локальные данные
+        logger.info("Google API: Table updating")
+
         spreadsheet = self.client.open_by_url(self.configs['docs-google-link'])
         sheet = spreadsheet.worksheet(self.configs['list-name'])
     
@@ -63,6 +64,6 @@ class GoogleSheets:
 
 # -------------------------------------------------------
 carTable = None
-with open('settings\\settings.json', 'r', encoding='utf-8') as file:
+with open('settings/settings.json', 'r', encoding='utf-8') as file:
     bot_configs = json.load(file)
     carTable = GoogleSheets(bot_configs)
