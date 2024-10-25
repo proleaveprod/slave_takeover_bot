@@ -10,11 +10,15 @@ class GoogleSheets:
         def __init__(self, table_row = list()):
             self.brand  = str()
             self.region = str()
+            self.name = str()
+
             self.data = list()
             if len(table_row):
                 self.data = table_row
                 self.region = self.data[0]
                 self.brand = self.data[1]
+                self.model = self.data[2]
+                self.configuration = self.data[4]
 
 
     def __init__(self, configs):

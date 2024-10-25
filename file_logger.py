@@ -16,7 +16,14 @@ def init():
     formatter = logging.Formatter('%(asctime)s %(levelname)-8s: %(message)s', datefmt='%d.%m.%Y %H:%M:%S')
     file_handler.setFormatter(formatter)
 
+    if True:
+        # Обработчик для вывода логов в консоль
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.DEBUG)
+        logger.addHandler(console_handler)
+
     # Добавляем обработчик в логгер
     logger.addHandler(file_handler)
 
+    print("File logger: Started")
 init()
