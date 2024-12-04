@@ -17,7 +17,7 @@ def init():
     formatter = logging.Formatter('%(asctime)s %(levelname)-7s %(module)s.%(funcName)s(): %(message)s', datefmt='%d.%m.%Y %H:%M:%S')
     file_handler.setFormatter(formatter)
 
-    if True:
+    if False:
         # Обработчик для вывода логов в консоль
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.DEBUG)

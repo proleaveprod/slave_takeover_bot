@@ -69,7 +69,7 @@ def handle_message(message):
     if(user_data):
         user_data = user_data[0]
     else:
-        logger.error(f"handle_message() No id = {message.chat.id} in database")
+        logger.warning(f"handle_message() No id = {message.chat.id} in database")
         start(message)
         return
     
