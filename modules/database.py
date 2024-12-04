@@ -1,6 +1,5 @@
 import sqlite3, json
-from .file_logger import logger
-from .constants import *
+from constants import *
 
 class Database():
     def __init__(self, filename, table_dict):
@@ -160,4 +159,35 @@ class Database():
 db = Database(path.abspath('data/database.db'), TABLES_DICT)
 
 if __name__ == "__main__":
-    pass
+    
+    # Перенос данных из .json в базу данных
+    filepath = 'user_data.json'
+    with open(filepath, 'r', encoding='utf-8') as f:
+        json_data = json.loads(f.read())
+        for chat_id in json_data.keys():
+            stage = STAGE_ZERO
+            
+            region = json_data[chat_id].get('region')
+            brand = json_data[chat_id].get('brand')
+            if brand:
+                stage = STAGE_BRAND_CHOSEN
+            else:
+                brand = ''
+
+            if region:
+                stage = STAGE_REGION_CHOSEN
+            else:
+                region = ''
+
+            user_data = {
+                'id': chat_id,
+                'username': '',
+                'stage': stage,
+                'region': region,
+                'brand': brand,
+                'born_date': '',
+                'last_action_date': ''
+            }
+
+            db.add(USERS_TABLE,user_data) 
+    
