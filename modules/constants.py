@@ -3,7 +3,7 @@ from datetime import datetime
 import json
 
 def get_date_str() -> str:
-    return datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    return datetime.now().strftime("%d-%m-%Y %H.%M.%S")
 
 def load_json(filepath):
     if path.exists(filepath):

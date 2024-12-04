@@ -1,4 +1,5 @@
 import logging
+from .constants import get_date_str
 
 logger = logging.Logger
 
@@ -9,7 +10,7 @@ def init():
     logger.setLevel(logging.DEBUG)  # Устанавливаем уровень логирования
 
     # Создаем обработчик для записи логов в файл
-    file_handler = logging.FileHandler('logging.info',encoding='utf-8')
+    file_handler = logging.FileHandler(f'logs/{get_date_str()}.txt',encoding='utf-8')
     file_handler.setLevel(logging.DEBUG)  # Устанавливаем уровень логирования для обработчика
 
     # Задаем формат логов

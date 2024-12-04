@@ -7,39 +7,19 @@ from .google_sheets import carTable
 from .constants import *
 from .database  import db
 
-def check_stage(*required_stage):
-    """Декоратор для проверки stage в user_data перед вызовом обработчика."""
-    def decorator(handler):
-        @wraps(handler)
-        def wrapper(message, *args, **kwargs):
-            # Извлекаем user_data из базы данных
-            user_data = db.find(USERS_TABLE, 'id', message.chat.id)
-            
-            logger.debug("--------------------")
-            logger.debug(f"check_stage required: {required_stage}")
-
-            # Проверяем, что user_data не пустой и имеет нужное значение stage
-            if user_data:
-                logger.debug(f"check_stage current: {user_data[0].get('stage')}")
-                
-                if user_data[0].get('stage') in required_stage:
-                    logger.debug("check_stage: OK")
-                    logger.debug("--------------------")
-                    return handler(message, user_data=user_data[0], *args, **kwargs)
-                
-                logger.debug("check_stage: ERROR")
-                logger.debug("--------------------")
-                return None  # Ничего не делаем, если проверка не прошла
-        return wrapper
-    return decorator
+# Инициализация бота
+bot = telebot.TeleBot(SETTINGS.get('bot-telegram-token'))
 
 def get_username(msg):
     username = msg.from_user.username
     return str(username)
 
-# Инициализация бота
-bot = telebot.TeleBot(SETTINGS.get('bot-telegram-token'))
-
+def brand_menu_markup(region):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)        
+    markup.add(types.KeyboardButton("⬅️ Назад"))
+    for brand in carTable.brands[region]:
+        markup.add(types.KeyboardButton(brand))
+    return markup
 
 # Обработка команды /start
 @bot.message_handler(commands=['start'])
@@ -60,8 +40,8 @@ def start(message):
         user_data = user_data[0]
         user_data['username'] = get_username(message)
         user_data['stage'] = STAGE_ZERO
-        user_data['region'] = ' '
-        user_data['brand'] = ' '
+        user_data['region'] = ''
+        user_data['brand'] = ''
         user_data['last_action_date'] = get_date_str()
         db.update(USERS_TABLE, user_data)
     else: # Новый пользователь
@@ -93,10 +73,16 @@ def handle_message(message):
         start(message)
         return
     
-
     if text == "⬅️ Назад":
-        if user_data['stage'] == 
-        start(message)
+        if user_data['stage'] == STAGE_BRAND_CHOSEN:
+            markup = brand_menu_markup(user_data['region'])
+            bot.send_message(message.chat.id, f"Выберите марку автомобиля", reply_markup=markup)
+            user_data['stage'] = STAGE_REGION_CHOSEN
+            user_data['brand'] = ''
+            db.update(USERS_TABLE,user_data)
+
+        else:
+            start(message)
         return
 
     elif text == "🛠 Обновить базу":
@@ -111,16 +97,12 @@ def handle_message(message):
             bot.send_message(message.chat.id, "Доступ запрещен")
 
     # Пользователь выбирает регион
-    if user_data['stage'] == STAGE_ZERO:
+    elif user_data['stage'] == STAGE_ZERO:
         if (text in carTable.brands.keys()):
             user_data['stage'] = STAGE_REGION_CHOSEN
             user_data['region'] = text
 
-            # Создаем клавиатуру с брендами для выбранного региона
-            markup = types.ReplyKeyboardMarkup(resize_keyboard=True)        
-            markup.add(types.KeyboardButton("⬅️ Назад"))
-            for brand in carTable.brands[text]:
-                markup.add(types.KeyboardButton(brand))
+            markup = brand_menu_markup(text)
             bot.send_message(message.chat.id, f"Выберите марку автомобиля", reply_markup=markup)
 
     # Пользователь выбирает бренд
