@@ -1,11 +1,10 @@
-import gspread, json
+import gspread
+
 from oauth2client.service_account import ServiceAccountCredentials
-
-from file_logger import logger
-
+from .file_logger import logger
+from .constants import *
 
 class GoogleSheets:
-
     class Car:
         def __init__(self, table_row = list()):
             self.brand  = str()
@@ -20,7 +19,6 @@ class GoogleSheets:
                 self.model = self.data[2]
                 self.configuration = self.data[4]
 
-
     def __init__(self, configs):
         self.configs = configs
 
@@ -29,21 +27,21 @@ class GoogleSheets:
         self.cars     = list()
 
         try:
-            logger.info("Google API: Auth...")
+            logger.info("Auth...")
             scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
             creds = ServiceAccountCredentials.from_json_keyfile_name(filename=self.configs['api-key-filename'],
                                                                      scopes=scope)
             self.client = gspread.authorize(creds)
-            logger.info("Google API: Auth is OK")
+            logger.info("Auth is OK")
         except Exception as err:
-            logger.error(f"Google API: Auth ERROR:\n{err}")
+            logger.error(f"Auth ERROR:\n{err}")
 
     def update(self):  # Обновить локальные данные
-        logger.info("Google API: Table updating")
-
+        logger.info("Table updating...")
+        
         spreadsheet = self.client.open_by_url(self.configs['docs-google-link'])
         sheet = spreadsheet.worksheet(self.configs['list-name'])
-    
+
         self.columns.clear()
         self.brands.clear()
         self.cars.clear()
@@ -51,7 +49,6 @@ class GoogleSheets:
         data_list = sheet.get_all_values()
         self.columns = data_list[0] # Заполнение колонок
         for data in data_list[1:]:
-
             if data[0] not in self.brands.keys():
                 if data[0] == '':
                     continue
@@ -63,11 +60,7 @@ class GoogleSheets:
                 self.brands[data[0]].append(data[1])
 
             self.cars.append(self.Car(data))
-
-
+        logger.info("Successfull update")
 
 # -------------------------------------------------------
-carTable = None
-with open('settings/settings.json', 'r', encoding='utf-8') as file:
-    bot_configs = json.load(file)
-    carTable = GoogleSheets(bot_configs)
+carTable = GoogleSheets(SETTINGS)
