@@ -4,8 +4,8 @@
 
   "api-key-filename": "data/apikey-shokh-cancars-api-19015f403b25.json",
   
-  "bot-telegram-token-prod": "7556710469:AAGXX5gnc70BGQyJpYOzO-dc1TtAA5b6F1U",
-  "bot-telegram-token": "8086725717:AAHuI6mJB3LtUf4RDXh8MnuuJ-hXXc3CNVw",
+  "bot-telegram-token": "7556710469:AAGXX5gnc70BGQyJpYOzO-dc1TtAA5b6F1U",
+  "bot-telegram-token-dev": "8086725717:AAHuI6mJB3LtUf4RDXh8MnuuJ-hXXc3CNVw",
 
   "admin_list": [387180840, 152984444] 
 }

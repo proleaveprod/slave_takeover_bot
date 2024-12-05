@@ -1,5 +1,5 @@
 import sqlite3, json
-from constants import *
+from .constants import *
 
 class Database():
     def __init__(self, filename, table_dict):
